@@ -1,0 +1,498 @@
+\documentclass[11pt,a4paper]{article}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%                              PACKAGES
+% ══════════════════════════════════════════════════════════════════════════════
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+\usepackage{tcolorbox}
+\usepackage{array}
+\usepackage{colortbl}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%                              CONFIGURATION
+% ══════════════════════════════════════════════════════════════════════════════
+
+\geometry{margin=2cm, top=2.5cm, bottom=2.5cm}
+
+% Couleurs
+\definecolor{primary}{RGB}{37, 99, 235}
+\definecolor{secondary}{RGB}{16, 185, 129}
+\definecolor{dark}{RGB}{31, 41, 55}
+\definecolor{light}{RGB}{243, 244, 246}
+\definecolor{warning}{RGB}{245, 158, 11}
+\definecolor{accent}{RGB}{139, 92, 246}
+
+% Hyperlinks
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=primary,
+    citecolor=primary
+}
+
+% Titres
+\titleformat{\section}{\Large\bfseries\color{primary}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{dark}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{dark}}{\thesubsubsection}{1em}{}
+
+% En-têtes
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray}GeoRetail MVP - Executive Summary}
+\fancyhead[R]{\small\color{gray}Janvier 2025}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Boîtes colorées
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{highlightbox}[1][]{
+    colback=primary!5,
+    colframe=primary,
+    fonttitle=\bfseries,
+    title=#1,
+    rounded corners,
+    boxrule=0.5pt
+}
+
+\newtcolorbox{successbox}[1][]{
+    colback=secondary!5,
+    colframe=secondary,
+    fonttitle=\bfseries,
+    title=#1,
+    rounded corners,
+    boxrule=0.5pt
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=warning!5,
+    colframe=warning,
+    fonttitle=\bfseries,
+    title=#1,
+    rounded corners,
+    boxrule=0.5pt
+}
+
+% ══════════════════════════════════════════════════════════════════════════════
+%                              DOCUMENT
+% ══════════════════════════════════════════════════════════════════════════════
+
+\begin{document}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                              PAGE DE TITRE
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    % Logo/Icône
+    {\Huge\color{primary}\faMapMarkedAlt}
+    
+    \vspace{1cm}
+    
+    {\Huge\bfseries\color{dark} GeoRetail MVP}
+    
+    \vspace{0.5cm}
+    
+    {\Large\color{gray} Plateforme de Cartographie des Points de Vente au Maroc}
+    
+    \vspace{2cm}
+    
+    \begin{tcolorbox}[
+        colback=light,
+        colframe=primary,
+        width=0.8\textwidth,
+        arc=3mm,
+        boxrule=1pt
+    ]
+        \centering
+        {\Large\bfseries Executive Summary}\\[0.5cm]
+        {\large Version 2.0 Final}\\[0.3cm]
+        {\normalsize Projet de Fin d'Études - Master DSIA}
+    \end{tcolorbox}
+    
+    \vspace{2cm}
+    
+    % Statistiques clés
+    \begin{tabular}{ccc}
+        \begin{tcolorbox}[
+            colback=primary,
+            colframe=primary,
+            width=3.5cm,
+            arc=2mm,
+            boxrule=0pt
+        ]
+            \centering
+            {\Huge\bfseries\color{white} 2976}\\
+            {\small\color{white} Points de Vente}
+        \end{tcolorbox}
+        &
+        \begin{tcolorbox}[
+            colback=secondary,
+            colframe=secondary,
+            width=3.5cm,
+            arc=2mm,
+            boxrule=0pt
+        ]
+            \centering
+            {\Huge\bfseries\color{white} 12}\\
+            {\small\color{white} Régions}
+        \end{tcolorbox}
+        &
+        \begin{tcolorbox}[
+            colback=accent,
+            colframe=accent,
+            width=3.5cm,
+            arc=2mm,
+            boxrule=0pt
+        ]
+            \centering
+            {\Huge\bfseries\color{white} 100\%}\\
+            {\small\color{white} Open Source}
+        \end{tcolorbox}
+    \end{tabular}
+    
+    \vfill
+    
+    {\large\color{gray} Janvier 2025}
+    
+\end{titlepage}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%                              CONTENU
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Résumé Exécutif}
+
+\begin{highlightbox}[\faLightbulb\ Vision du Projet]
+GeoRetail est une plateforme de cartographie intelligente des points de vente au Maroc, développée comme \textbf{Minimum Viable Product (MVP)} démontrant les compétences techniques en développement full-stack, intégration d'APIs géospatiales, et conception d'architecture data-driven.
+\end{highlightbox}
+
+\subsection{Objectifs Atteints}
+
+\begin{itemize}[leftmargin=*]
+    \item[\color{secondary}\faCheckCircle] \textbf{Collecte automatisée} de données géographiques via OpenStreetMap
+    \item[\color{secondary}\faCheckCircle] \textbf{Interface cartographique} interactive avec Leaflet.js et clustering
+    \item[\color{secondary}\faCheckCircle] \textbf{API RESTful} complète avec FastAPI et documentation Swagger
+    \item[\color{secondary}\faCheckCircle] \textbf{Système de filtrage} multi-critères (type, région, enseigne)
+    \item[\color{secondary}\faCheckCircle] \textbf{Export multi-format} (CSV, GeoJSON) pour interopérabilité
+    \item[\color{secondary}\faCheckCircle] \textbf{Architecture extensible} prête pour sources premium
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Architecture Technique}
+
+\subsection{Stack Technologique}
+
+\begin{center}
+\begin{tabular}{>{\columncolor{light}}l l l}
+\toprule
+\textbf{Composant} & \textbf{Technologie} & \textbf{Version} \\
+\midrule
+Backend & FastAPI (Python) & 0.109+ \\
+Frontend & HTML5/CSS3/JavaScript & ES6+ \\
+Cartographie & Leaflet.js + MarkerCluster & 1.9.4 \\
+Données & OpenStreetMap (Overpass API) & - \\
+Géocodage & Nominatim & - \\
+Base de données & JSON (prototype) & - \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Flux de Données}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    box/.style={rectangle, draw=primary, fill=primary!10, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, thick, color=dark}
+]
+    \node[box] (osm) {OpenStreetMap\\Overpass API};
+    \node[box, right of=osm] (backend) {FastAPI\\Backend};
+    \node[box, right of=backend] (db) {JSON\\Database};
+    \node[box, right of=db] (frontend) {Leaflet\\Frontend};
+    
+    \draw[arrow] (osm) -- (backend);
+    \draw[arrow] (backend) -- (db);
+    \draw[arrow] (db) -- (frontend);
+    \draw[arrow, bend left=30] (frontend) to node[above, font=\tiny] {API Calls} (backend);
+\end{tikzpicture}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Données Collectées}
+
+\subsection{Statistiques Actuelles}
+
+\begin{center}
+\begin{tabular}{ll}
+\begin{minipage}{0.45\textwidth}
+\begin{successbox}[\faDatabase\ Volume de Données]
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{Total POS:} 2 976
+    \item \textbf{Commerce moderne:} 1 039 (35\%)
+    \item \textbf{Commerce traditionnel:} 1 937 (65\%)
+    \item \textbf{Source:} 100\% OpenStreetMap
+\end{itemize}
+\end{successbox}
+\end{minipage}
+&
+\begin{minipage}{0.45\textwidth}
+\begin{highlightbox}[\faMapMarkerAlt\ Couverture Géographique]
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{Fès:} 1 464 POS
+    \item \textbf{Casablanca:} 332 POS
+    \item \textbf{Tanger:} 282 POS
+    \item \textbf{Marrakech:} 276 POS
+    \item \textbf{Agadir:} 187 POS
+\end{itemize}
+\end{highlightbox}
+\end{minipage}
+\end{tabular}
+\end{center}
+
+\subsection{Répartition par Catégorie}
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Catégorie} & \textbf{Nombre} & \textbf{Pourcentage} \\
+\midrule
+Épicerie & 1 076 & 36.2\% \\
+Hypermarché & 793 & 26.6\% \\
+Boucherie & 379 & 12.7\% \\
+Boulangerie & 376 & 12.6\% \\
+Supermarché & 235 & 7.9\% \\
+Autres & 117 & 3.9\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Sources de Données}
+
+\subsection{Sources Gratuites Implémentées}
+
+\begin{successbox}[\faCheckCircle\ OpenStreetMap - Source Principale]
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{API:} Overpass API (requêtes géographiques)
+    \item \textbf{Couverture:} Environ 3 000 POS au Maroc
+    \item \textbf{Avantages:} Gratuit, données collaboratives, mise à jour continue
+    \item \textbf{Limitations:} Couverture inégale selon les régions
+\end{itemize}
+\end{successbox}
+
+\vspace{0.5cm}
+
+\begin{successbox}[\faCheckCircle\ Nominatim - Géocodage Complémentaire]
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{Fonction:} Recherche par nom d'enseigne et ville
+    \item \textbf{Rate limit:} 1 requête/seconde (respecté)
+    \item \textbf{Utilisation:} Enrichissement de données existantes
+\end{itemize}
+\end{successbox}
+
+\subsection{Options Premium Documentées (Non Implémentées)}
+
+\begin{warningbox}[\faExclamationTriangle\ Sources Payantes - Pour Référence]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Source} & \textbf{Couverture Estimée} & \textbf{Coût} \\
+\midrule
+Google Places API & Environ 300 000 POS & 17 USD/1000 req \\
+HERE Places API & Environ 150 000 POS & 5 USD/1000 req \\
+Foursquare Places & Environ 100 000 POS & 99 USD/mois \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textit{Note: Ces sources nécessitent des budgets ou partenariats commerciaux non disponibles pour un projet académique.}
+\end{warningbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Fonctionnalités de l'Application}
+
+\subsection{API REST Endpoints}
+
+\begin{center}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Méthode} & \textbf{Endpoint} & \textbf{Description} \\
+\midrule
+GET & \texttt{/pos} & Liste tous les POS avec filtres \\
+POST & \texttt{/pos} & Crée un nouveau POS \\
+GET & \texttt{/pos/\{id\}} & Détail d'un POS \\
+DELETE & \texttt{/pos/\{id\}} & Supprime un POS \\
+GET & \texttt{/pos/search/nearby} & Recherche par proximité \\
+GET & \texttt{/pos/search/bbox} & Recherche par zone \\
+POST & \texttt{/collect/osm} & Lance collecte OSM \\
+POST & \texttt{/import/csv} & Import fichier CSV \\
+GET & \texttt{/export/geojson} & Export GeoJSON \\
+GET & \texttt{/stats} & Statistiques globales \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Interface Utilisateur}
+
+\begin{multicols}{2}
+\textbf{Fonctionnalités Cartographiques:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item Carte interactive Leaflet
+    \item Clustering intelligent des marqueurs
+    \item Marqueurs différenciés par type
+    \item Popups informatifs
+    \item Zoom et navigation fluides
+\end{itemize}
+
+\columnbreak
+
+\textbf{Fonctionnalités de Gestion:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item Filtrage multi-critères
+    \item Ajout manuel de POS
+    \item Import CSV/JSON
+    \item Export des données
+    \item Tableau de bord statistiques
+\end{itemize}
+\end{multicols}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Compétences Démontrées}
+
+\begin{highlightbox}[\faGraduationCap\ Compétences Techniques Validées]
+\begin{multicols}{2}
+\textbf{Développement Backend:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item API RESTful avec FastAPI
+    \item Programmation asynchrone (async/await)
+    \item Validation de données (Pydantic)
+    \item Gestion d'erreurs HTTP
+\end{itemize}
+
+\columnbreak
+
+\textbf{Développement Frontend:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item JavaScript ES6+
+    \item Manipulation DOM
+    \item Appels API fetch
+    \item UI/UX moderne
+\end{itemize}
+\end{multicols}
+
+\vspace{0.5cm}
+
+\begin{multicols}{2}
+\textbf{Data Engineering:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item Intégration APIs externes
+    \item ETL (Extract, Transform, Load)
+    \item Déduplication de données
+    \item Calculs géospatiaux
+\end{itemize}
+
+\columnbreak
+
+\textbf{Architecture:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item Architecture modulaire
+    \item Séparation des concerns
+    \item Documentation API (Swagger)
+    \item Gestion de configuration
+\end{itemize}
+\end{multicols}
+\end{highlightbox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Évolutions Potentielles}
+
+\subsection{Court Terme (v2.1)}
+
+\begin{itemize}[leftmargin=*]
+    \item Migration vers PostgreSQL/PostGIS pour performances
+    \item Authentification utilisateur (JWT)
+    \item Cache Redis pour requêtes fréquentes
+\end{itemize}
+
+\subsection{Moyen Terme (v3.0)}
+
+\begin{itemize}[leftmargin=*]
+    \item Intégration Google Places (avec budget)
+    \item Application mobile React Native
+    \item Dashboard analytics avancé
+    \item API publique avec rate limiting
+\end{itemize}
+
+\subsection{Long Terme (Vision)}
+
+\begin{itemize}[leftmargin=*]
+    \item Plateforme SaaS multi-tenant
+    \item Machine Learning pour prédiction de zones
+    \item Partenariats avec distributeurs
+    \item Expansion régionale (Afrique du Nord)
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+
+\section{Conclusion}
+
+\begin{highlightbox}[\faStar\ Bilan du Projet]
+Le MVP GeoRetail démontre avec succès la capacité à concevoir et développer une plateforme de cartographie commerciale complète, en utilisant exclusivement des technologies et données open source.
+
+\vspace{0.5cm}
+
+\textbf{Points Forts:}
+\begin{itemize}[leftmargin=*,nosep]
+    \item Architecture technique robuste et extensible
+    \item Collecte automatisée fonctionnelle (2 976 POS)
+    \item Interface utilisateur moderne et intuitive
+    \item Documentation complète (API Swagger)
+    \item Code maintenable et bien structuré
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Valeur Ajoutée:}
+
+Le projet transforme les contraintes de ressources (absence de budget pour APIs premium) en démonstration de compétences d'ingénieur: trouver des solutions créatives, maximiser les sources gratuites, et documenter clairement les options d'évolution pour un contexte de production.
+\end{highlightbox}
+
+\vfill
+
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}
+
+\vspace{0.5cm}
+
+{\small\color{gray}
+\textbf{GeoRetail MVP v2.0 Final}\\
+Projet de Fin d'Études - Master Data Science et Intelligence Artificielle\\
+Janvier 2025
+}
+\end{center}
+
+\end{document}

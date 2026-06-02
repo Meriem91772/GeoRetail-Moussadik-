@@ -1,0 +1,9 @@
+
+{
+  "name": "Moussadik - Recensement POS Maroc",
+  "description": "Application collaborative de recensement et validation des points de vente au Maroc. Gagnez des récompenses en certifiant l'existence des commerces de proximité.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoRetail Database - Plateforme de Collecte</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0078B4;
+            --primary-dark: #005a87;
+            --secondary: #22A722;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: white; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+        }
+        .logo h1 { font-size: 1.25rem; font-weight: 700; }
+        .logo span { font-size: 0.7rem; opacity: 0.9; }
+
+        .header-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.25rem; font-weight: 700; }
+        .stat-label { font-size: 0.65rem; opacity: 0.9; }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .header-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-add { background: var(--secondary); color: white; }
+        .btn-add:hover { background: #1a8f1a; }
+        .btn-import { background: var(--warning); color: white; }
+        .btn-import:hover { background: #d97706; }
+        .btn-collect { background: #8b5cf6; color: white; }
+        .btn-collect:hover { background: #7c3aed; }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+            margin-top: 56px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-section h3 {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); }
+        .filter-group select {
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .type-toggles {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .type-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .type-btn.active { border-color: var(--primary); background: #e0f2fe; }
+        .type-btn.moderne { color: var(--primary); }
+        .type-btn.traditionnel { color: var(--secondary); }
+
+        /* Results */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+        }
+        .results-count { font-weight: 600; font-size: 0.9rem; }
+
+        .results-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .pos-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pos-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .pos-card.moderne { border-left: 3px solid var(--primary); }
+        .pos-card.traditionnel { border-left: 3px solid var(--secondary); }
+
+        .pos-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .pos-name { font-weight: 600; font-size: 0.9rem; }
+        .pos-badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-moderne { background: #dbeafe; color: var(--primary); }
+        .badge-traditionnel { background: #dcfce7; color: var(--secondary); }
+
+        .pos-address { font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0; }
+        .pos-meta { display: flex; gap: 0.75rem; font-size: 0.7rem; color: var(--text-secondary); }
+        .pos-score { display: flex; align-items: center; gap: 0.25rem; }
+        .score-bar {
+            width: 40px; height: 4px;
+            background: #e5e7eb; border-radius: 2px;
+            overflow: hidden;
+        }
+        .score-fill { height: 100%; background: var(--secondary); }
+
+        /* Map */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        #map { width: 100%; height: 100%; }
+
+        .map-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 500;
+        }
+        .map-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            box-shadow: var(--shadow);
+        }
+        .map-btn:hover { background: var(--bg-light); }
+
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { font-size: 1.1rem; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body { padding: 1.25rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { font-size: 0.8rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg-light); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border); }
+
+        /* Import zone */
+        .import-zone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .import-zone:hover { border-color: var(--primary); background: #f0f9ff; }
+        .import-zone.dragover { border-color: var(--secondary); background: #f0fdf4; }
+        .import-zone input { display: none; }
+        .import-zone p { margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem; }
+
+        /* Collect status */
+        .collect-status {
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .collect-status.running { background: #fef3c7; }
+        .collect-status.success { background: #dcfce7; }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { border-left: 4px solid var(--secondary); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Stats Modal */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .stat-card {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-card .label { font-size: 0.8rem; color: var(--text-secondary); }
+        .chart-container { margin-top: 1rem; height: 200px; }
+
+        /* Source badge */
+        .source-badge {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            background: #f3f4f6;
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: 40%; }
+            .main-container { flex-direction: column; }
+            .header-stats { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">📍</div>
+            <div>
+                <h1>GeoRetail Database</h1>
+                <span>Plateforme de Collecte - Redmac Consulting</span>
+            </div>
+        </div>
+        
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">Points de Vente</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-modernes">0</div>
+                <div class="stat-label">Modernes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-traditionnels">0</div>
+                <div class="stat-label">Traditionnels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-regions">0</div>
+                <div class="stat-label">Régions</div>
+            </div>
+        </div>
+        
+        <div class="header-actions">
+            <button class="header-btn btn-add" onclick="openAddModal()">➕ Ajouter</button>
+            <button class="header-btn btn-import" onclick="openImportModal()">📥 Importer</button>
+            <button class="header-btn btn-collect" onclick="openCollectModal()">🌍 Collecter</button>
+            <button class="header-btn" style="background:#6366f1;color:white" onclick="openStatsModal()">📊 Stats</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>🔍 Rechercher</h3>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Nom, ville, adresse...">
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>📁 Filtres</h3>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label>Région</label>
+                        <select id="filter-region">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Catégorie</label>
+                        <select id="filter-categorie">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Enseigne</label>
+                        <select id="filter-enseigne">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Source</label>
+                        <select id="filter-source">
+                            <option value="">Toutes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="type-toggles">
+                    <button class="type-btn active" data-type="all" onclick="setTypeFilter('all')">🏪 Tous</button>
+                    <button class="type-btn moderne" data-type="moderne" onclick="setTypeFilter('moderne')">🏬 Moderne</button>
+                    <button class="type-btn traditionnel" data-type="traditionnel" onclick="setTypeFilter('traditionnel')">🏠 Traditionnel</button>
+                </div>
+            </div>
+            
+            <div class="results-header">
+                <span class="results-count"><span id="results-count">0</span> résultats</span>
+                <div>
+                    <button class="map-btn" onclick="exportCSV()">📥 CSV</button>
+                    <button class="map-btn" onclick="exportGeoJSON()">🗺️ GeoJSON</button>
+                </div>
+            </div>
+            
+            <div class="results-list" id="results-list">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </aside>
+
+        <!-- Map -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-controls">
+                <button class="map-btn" onclick="centerMap()">🇲🇦 Centrer Maroc</button>
+                <button class="map-btn" onclick="toggleClusters()">📍 Clusters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Add POS Modal -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>➕ Ajouter un Point de Vente</h2>
+                <button class="modal-close" onclick="closeModal('add-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-form" onsubmit="submitAddForm(event)">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Nom du commerce *</label>
+                            <input type="text" name="nom" required placeholder="Ex: Épicerie El Baraka">
+                        </div>
+                        <div class="form-group">
+                            <label>Type *</label>
+                            <select name="type" required onchange="updateCategories(this.value)">
+                                <option value="traditionnel">Traditionnel</option>
+                                <option value="moderne">Moderne</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Catégorie *</label>
+                            <select name="categorie" id="add-categorie" required>
+                                <option value="épicerie">Épicerie</option>
+                                <option value="boulangerie">Boulangerie</option>
+                                <option value="primeur">Primeur</option>
+                                <option value="boucherie">Boucherie</option>
+                                <option value="poissonnerie">Poissonnerie</option>
+                                <option value="droguerie">Droguerie</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Enseigne</label>
+                            <input type="text" name="enseigne" placeholder="Ex: Marjane, BIM...">
+                        </div>
+                        <div class="form-group">
+                            <label>Région *</label>
+                            <select name="region" id="add-region" required></select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Adresse *</label>
+                            <input type="text" name="adresse" required placeholder="Ex: 123 Rue Hassan II">
+                        </div>
+                        <div class="form-group">
+                            <label>Ville *</label>
+                            <input type="text" name="ville" required placeholder="Ex: Casablanca">
+                        </div>
+                        <div class="form-group">
+                            <label>Téléphone</label>
+                            <input type="text" name="telephone" placeholder="Ex: +212 5XX-XXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label>Latitude *</label>
+                            <input type="number" name="latitude" step="any" required placeholder="Ex: 33.5731">
+                        </div>
+                        <div class="form-group">
+                            <label>Longitude *</label>
+                            <input type="number" name="longitude" step="any" required placeholder="Ex: -7.5898">
+                        </div>
+                    </div>
+                    <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.75rem">
+                        💡 Astuce: Cliquez sur la carte pour obtenir les coordonnées automatiquement
+                    </p>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('add-modal')">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter le POS</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="import-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📥 Importer des données</h2>
+                <button class="modal-close" onclick="closeModal('import-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-zone" id="import-zone" onclick="document.getElementById('import-file').click()">
+                    <div style="font-size:2.5rem">📁</div>
+                    <p><strong>Cliquez ou glissez un fichier ici</strong></p>
+                    <p>Formats acceptés: CSV, JSON</p>
+                    <input type="file" id="import-file" accept=".csv,.json" onchange="handleFileSelect(event)">
+                </div>
+                
+                <div style="margin-top:1.5rem">
+                    <h4 style="margin-bottom:0.5rem">📋 Format attendu</h4>
+                    <p style="font-size:0.8rem;color:var(--text-secondary)">Colonnes: nom, type, categorie, adresse, ville, region, latitude, longitude, telephone (optionnel)</p>
+                    <pre style="background:var(--bg-light);padding:0.75rem;border-radius:6px;font-size:0.75rem;overflow-x:auto;margin-top:0.5rem">
+nom,type,categorie,adresse,ville,region,latitude,longitude
+Épicerie El Baraka,traditionnel,épicerie,Rue 10,Casablanca,Casablanca-Settat,33.5731,-7.5898
+Marjane Ain Diab,moderne,hypermarché,Bd Corniche,Casablanca,Casablanca-Settat,33.5983,-7.6667</pre>
+                </div>
+                
+                <div id="import-result" style="display:none;margin-top:1rem" class="collect-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collect Modal -->
+    <div class="modal-overlay" id="collect-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🌍 Collecter depuis OpenStreetMap</h2>
+                <button class="modal-close" onclick="closeModal('collect-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem">Sélectionnez les régions à collecter depuis OpenStreetMap:</p>
+                
+                <div id="collect-regions" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem">
+                </div>
+                
+                <div class="form-actions" style="margin-top:0">
+                    <button class="btn btn-secondary" onclick="selectAllRegions(true)">✅ Tout sélectionner</button>
+                    <button class="btn btn-secondary" onclick="selectAllRegions(false)">❌ Tout désélectionner</button>
+                    <button class="btn btn-primary" onclick="startCollection()" id="collect-btn">🚀 Lancer la collecte</button>
+                </div>
+                
+                <div id="collect-status" class="collect-status" style="display:none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal-overlay" id="stats-modal">
+        <div class="modal" style="max-width:800px">
+            <div class="modal-header">
+                <h2>📊 Statistiques</h2>
+                <button class="modal-close" onclick="closeModal('stats-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid" id="stats-cards"></div>
+                <div class="chart-container">
+                    <canvas id="stats-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="source-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <script>
+        // Configuration
+        const API_BASE = 'http://127.0.0.1:8000';
+        
+        // State
+        let map, markersLayer, clusterGroup;
+        let allPOS = [];
+        let filteredPOS = [];
+        let useClusters = true;
+        let currentFilters = { type: 'all', region: '', categorie: '', enseigne: '', source: '', search: '' };
+        
+        // Regions list
+        const REGIONS = [
+            "Casablanca-Settat", "Rabat-Salé-Kénitra", "Marrakech-Safi", "Fès-Meknès",
+            "Tanger-Tétouan-Al Hoceïma", "Souss-Massa", "Oriental", "Béni Mellal-Khénifra", "Drâa-Tafilalet"
+        ];
+        
+        const CATEGORIES_MODERNE = ["hypermarché", "supermarché", "supérette", "hard_discount", "franchise"];
+        const CATEGORIES_TRADITIONNEL = ["épicerie", "boulangerie", "primeur", "boucherie", "poissonnerie", "droguerie", "autre"];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadMetadata();
+            loadPOS();
+            setupEventListeners();
+            setupDragDrop();
+        });
+        
+        // Map
+        function initMap() {
+            map = L.map('map').setView([31.7917, -7.0926], 6);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap | GeoRetail Database'
+            }).addTo(map);
+            
+            markersLayer = L.layerGroup().addTo(map);
+            clusterGroup = L.markerClusterGroup({
+                maxClusterRadius: 50,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false
+            });
+            
+            // Click on map to get coordinates
+            map.on('click', (e) => {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+                
+                // Fill form if open
+                const latInput = document.querySelector('#add-form input[name="latitude"]');
+                const lngInput = document.querySelector('#add-form input[name="longitude"]');
+                if (latInput && lngInput) {
+                    latInput.value = lat;
+                    lngInput.value = lng;
+                    showToast(`Coordonnées: ${lat}, ${lng}`, 'info');
+                }
+            });
+        }
+        
+        function updateMap() {
+            markersLayer.clearLayers();
+            clusterGroup.clearLayers();
+            
+            const layer = useClusters ? clusterGroup : markersLayer;
+            
+            filteredPOS.forEach(pos => {
+                const isModerne = pos.type === 'moderne';
+                const icon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="
+                        background: ${isModerne ? '#0078B4' : '#22A722'};
+                        width: 24px; height: 24px;
+                        border-radius: 50%;
+                        border: 2px solid white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 12px;
+                    ">${isModerne ? '🏬' : '🏪'}</div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                
+                const marker = L.marker([pos.latitude, pos.longitude], { icon });
+                
+                marker.bindPopup(`
+                    <div style="min-width:200px">
+                        <strong>${pos.nom}</strong><br>
+                        <span style="color:${isModerne ? '#0078B4' : '#22A722'}">${pos.type}</span> - ${pos.categorie}<br>
+                        ${pos.enseigne ? `<em>${pos.enseigne}</em><br>` : ''}
+                        📍 ${pos.adresse}<br>
+                        🏙️ ${pos.ville}, ${pos.region}<br>
+                        ${pos.telephone ? `📞 ${pos.telephone}<br>` : ''}
+                        <small>Source: ${pos.source} | Score: ${pos.score_confiance}%</small>
+                    </div>
+                `);
+                
+                layer.addLayer(marker);
+            });
+            
+            if (useClusters) {
+                map.addLayer(clusterGroup);
+            }
+        }
+        
+        function centerMap() {
+            map.setView([31.7917, -7.0926], 6);
+        }
+        
+        function toggleClusters() {
+            useClusters = !useClusters;
+            if (useClusters) {
+                map.removeLayer(markersLayer);
+                map.addLayer(clusterGroup);
+            } else {
+                map.removeLayer(clusterGroup);
+                map.addLayer(markersLayer);
+            }
+            updateMap();
+            showToast(`Clusters ${useClusters ? 'activés' : 'désactivés'}`, 'info');
+        }
+        
+        // Data loading
+        async function loadPOS() {
+            try {
+                const res = await fetch(`${API_BASE}/pos?limit=5000`);
+                if (!res.ok) throw new Error('API error');
+                allPOS = await res.json();
+                applyFilters();
+                updateStats();
+            } catch (err) {
+                console.error('Error loading POS:', err);
+                showToast('Erreur de connexion à l\'API', 'error');
+            }
+        }
+        
+        async function loadMetadata() {
+            try {
+                // Regions
+                const regionSelect = document.getElementById('filter-region');
+                const addRegionSelect = document.getElementById('add-region');
+                REGIONS.forEach(r => {
+                    regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                    addRegionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                });
+                
+                // Categories
+                const catSelect = document.getElementById('filter-categorie');
+                [...CATEGORIES_MODERNE, ...CATEGORIES_TRADITIONNEL].forEach(c => {
+                    catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+                
+                // Sources
+                const sourceSelect = document.getElementById('filter-source');
+                const sources = ['openstreetmap', 'ajout_manuel', 'import_csv', 'import_json', 'collecte_terrain', 'google_places'];
+                sources.forEach(s => {
+                    sourceSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                });
+                
+                // Enseignes from API
+                const enseigneRes = await fetch(`${API_BASE}/meta/enseignes`);
+                if (enseigneRes.ok) {
+                    const enseignes = await enseigneRes.json();
+                    const ensSelect = document.getElementById('filter-enseigne');
+                    enseignes.forEach(e => {
+                        ensSelect.innerHTML += `<option value="${e}">${e}</option>`;
+                    });
+                }
+                
+                // Collect regions checkboxes
+                const collectRegions = document.getElementById('collect-regions');
+                REGIONS.forEach(r => {
+                    collectRegions.innerHTML += `
+                        <label style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--bg-light);border-radius:6px;cursor:pointer">
+                            <input type="checkbox" value="${r}" checked>
+                            ${r}
+                        </label>
+                    `;
+                });
+            } catch (err) {
+                console.error('Error loading metadata:', err);
+            }
+        }
+        
+        // Filters
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                currentFilters.search = e.target.value;
+                applyFilters();
+            });
+            
+            ['region', 'categorie', 'enseigne', 'source'].forEach(f => {
+                document.getElementById(`filter-${f}`).addEventListener('change', (e) => {
+                    currentFilters[f] = e.target.value;
+                    applyFilters();
+                });
+            });
+        }
+        
+        function setTypeFilter(type) {
+            currentFilters.type = type;
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            filteredPOS = allPOS.filter(pos => {
+                if (currentFilters.type !== 'all' && pos.type !== currentFilters.type) return false;
+                if (currentFilters.region && pos.region !== currentFilters.region) return false;
+                if (currentFilters.categorie && pos.categorie !== currentFilters.categorie) return false;
+                if (currentFilters.enseigne && pos.enseigne !== currentFilters.enseigne) return false;
+                if (currentFilters.source && pos.source !== currentFilters.source) return false;
+                if (currentFilters.search) {
+                    const search = currentFilters.search.toLowerCase();
+                    if (!pos.nom.toLowerCase().includes(search) && 
+                        !pos.ville.toLowerCase().includes(search) &&
+                        !pos.adresse.toLowerCase().includes(search)) return false;
+                }
+                return true;
+            });
+            
+            document.getElementById('results-count').textContent = filteredPOS.length;
+            updateResultsList();
+            updateMap();
+        }
+        
+        function updateResultsList() {
+            const list = document.getElementById('results-list');
+            
+            if (filteredPOS.length === 0) {
+                list.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--text-secondary)">Aucun résultat</p>';
+                return;
+            }
+            
+            list.innerHTML = filteredPOS.slice(0, 100).map(pos => `
+                <div class="pos-card ${pos.type}" onclick="focusPOS(${pos.latitude}, ${pos.longitude})">
+                    <div class="pos-header">
+                        <span class="pos-name">${pos.nom}</span>
+                        <span class="pos-badge badge-${pos.type}">${pos.type}</span>
+                    </div>
+                    <div class="pos-address">📍 ${pos.adresse}, ${pos.ville}</div>
+                    <div class="pos-meta">
+                        <span>🏷️ ${pos.categorie}</span>
+                        ${pos.enseigne ? `<span>🏪 ${pos.enseigne}</span>` : ''}
+                        <span class="pos-score">
+                            <div class="score-bar"><div class="score-fill" style="width:${pos.score_confiance}%"></div></div>
+                            ${Math.round(pos.score_confiance)}%
+                        </span>
+                    </div>
+                    <div style="margin-top:0.25rem">
+                        <span class="source-badge">${pos.source}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function focusPOS(lat, lng) {
+            map.setView([lat, lng], 16);
+        }
+        
+        function updateStats() {
+            const modernes = allPOS.filter(p => p.type === 'moderne').length;
+            const traditionnels = allPOS.filter(p => p.type === 'traditionnel').length;
+            const regions = new Set(allPOS.map(p => p.region)).size;
+            
+            document.getElementById('stat-total').textContent = allPOS.length;
+            document.getElementById('stat-modernes').textContent = modernes;
+            document.getElementById('stat-traditionnels').textContent = traditionnels;
+            document.getElementById('stat-regions').textContent = regions;
+        }
+        
+        // Modals
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        function openAddModal() {
+            openModal('add-modal');
+        }
+        
+        function openImportModal() {
+            document.getElementById('import-result').style.display = 'none';
+            openModal('import-modal');
+        }
+        
+        function openCollectModal() {
+            document.getElementById('collect-status').style.display = 'none';
+            openModal('collect-modal');
+        }
+        
+        function openStatsModal() {
+            loadStatsModal();
+            openModal('stats-modal');
+        }
+        
+        // Add Form
+        function updateCategories(type) {
+            const select = document.getElementById('add-categorie');
+            const cats = type === 'moderne' ? CATEGORIES_MODERNE : CATEGORIES_TRADITIONNEL;
+            select.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+        
+        async function submitAddForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            const data = {
+                nom: formData.get('nom'),
+                type: formData.get('type'),
+                categorie: formData.get('categorie'),
+                enseigne: formData.get('enseigne') || null,
+                adresse: formData.get('adresse'),
+                ville: formData.get('ville'),
+                region: formData.get('region'),
+                latitude: parseFloat(formData.get('latitude')),
+                longitude: parseFloat(formData.get('longitude')),
+                telephone: formData.get('telephone') || null
+            };
+            
+            try {
+                const res = await fetch(`${API_BASE}/pos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Erreur');
+                }
+                
+                showToast('Point de vente ajouté avec succès!', 'success');
+                closeModal('add-modal');
+                form.reset();
+                loadPOS();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+        
+        // Import
+        function setupDragDrop() {
+            const zone = document.getElementById('import-zone');
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) uploadFile(file);
+            });
+        }
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) uploadFile(file);
+        }
+        
+        async function uploadFile(file) {
+            const resultDiv = document.getElementById('import-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'collect-status running';
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div></div> Import en cours...';
+            
+            const isCSV = file.name.endsWith('.csv');
+            const endpoint = isCSV ? '/import/csv' : '/import/json';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const res = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    resultDiv.className = 'collect-status success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Import terminé!</strong><br>
+                        ${data.added} points de vente ajoutés<br>
+                        Total en base: ${data.total_database}
+                        ${data.errors?.length ? `<br><small>⚠️ ${data.errors.length} erreurs</small>` : ''}
+                    `;
+                    loadPOS();
+                } else {
+                    throw new Error(data.detail || 'Erreur import');
+                }
+            } catch (err) {
+                resultDiv.className = 'collect-status';
+                resultDiv.style.background = '#fee2e2';
+                resultDiv.innerHTML = `❌ Erreur: ${err.message}`;
+            }
+        }
+        
+        // Collection
+        function selectAllRegions(select) {
+            document.querySelectorAll('#collect-regions input[type="checkbox"]').forEach(cb => {
+                cb.checked = select;
+            });
+        }
+        
+        async function startCollection() {
+            const checkboxes = document.querySelectorAll('#collect-regions input[type="checkbox"]:checked');
+            const regions = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (regions.length === 0) {
+                showToast('Sélectionnez au moins une région', 'error');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('collect-status');
+            const btn = document.getElementById('collect-btn');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'collect-status running';
+            statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div></div> Collecte en cours... Cela peut prendre plusieurs minutes.';
+            btn.disabled = true;
+            btn.textContent = '⏳ En cours...';
+            
+            try {
+                const params = regions.map(r => `regions=${encodeURIComponent(r)}`).join('&');
+                const res = await fetch(`${API_BASE}/collect/osm?${params}`, {
+                    method: 'POST'
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    statusDiv.className = 'collect-status success';
+                    statusDiv.innerHTML = `
+                        <strong>✅ Collecte terminée!</strong><br>
+                        ${data.collected} nouveaux points de vente ajoutés<br>
+                        Total en base: ${data.total_database}
+                    `;
+                    showToast(`${data.collected} POS collectés!`, 'success');
+                    loadPOS();
+                } else {
+                    throw new Error(data.detail || 'Erreur collecte');
+                }
+            } catch (err) {
+                statusDiv.className = 'collect-status';
+                statusDiv.style.background = '#fee2e2';
+                statusDiv.innerHTML = `❌ Erreur: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Lancer la collecte';
+            }
+        }
+        
+        // Stats Modal
+        async function loadStatsModal() {
+            try {
+                const res = await fetch(`${API_BASE}/stats`);
+                const stats = await res.json();
+                
+                // Cards
+                document.getElementById('stats-cards').innerHTML = `
+                    <div class="stat-card">
+                        <div class="value">${stats.total_pos}</div>
+                        <div class="label">Total POS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" style="color:var(--primary)">${stats.pos_modernes}</div>
+                        <div class="label">Modernes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" style="color:var(--secondary)">${stats.pos_traditionnels}</div>
+                        <div class="label">Traditionnels</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value">${stats.score_confiance_moyen?.toFixed(1) || 0}%</div>
+                        <div class="label">Score moyen</div>
+                    </div>
+                `;
+                
+                // Region chart
+                const regionLabels = Object.keys(stats.par_region || {});
+                const regionData = Object.values(stats.par_region || {});
+                
+                const ctx1 = document.getElementById('stats-chart').getContext('2d');
+                if (window.statsChart) window.statsChart.destroy();
+                window.statsChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: regionLabels,
+                        datasets: [{
+                            label: 'POS par région',
+                            data: regionData,
+                            backgroundColor: '#0078B4'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+                
+                // Source chart
+                const sourceLabels = Object.keys(stats.par_source || {});
+                const sourceData = Object.values(stats.par_source || {});
+                
+                const ctx2 = document.getElementById('source-chart').getContext('2d');
+                if (window.sourceChart) window.sourceChart.destroy();
+                window.sourceChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: sourceLabels,
+                        datasets: [{
+                            data: sourceData,
+                            backgroundColor: ['#0078B4', '#22A722', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'Répartition par source' }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error('Error loading stats:', err);
+            }
+        }
+        
+        // Export
+        function exportCSV() {
+            window.open(`${API_BASE}/export/csv${currentFilters.region ? '?region=' + currentFilters.region : ''}`, '_blank');
+        }
+        
+        function exportGeoJSON() {
+            window.open(`${API_BASE}/export/geojson${currentFilters.region ? '?region=' + currentFilters.region : ''}`, '_blank');
+        }
+        
+        // Toast
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+</body>
+</html>
