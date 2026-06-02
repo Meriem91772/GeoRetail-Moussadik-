@@ -4,12 +4,12 @@
 
 **Geo-Intelligence Platform for Mapping & Census of Points of Sale across Morocco**
 
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini_AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge\&logo=fastapi\&logoColor=white)
+![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge\&logo=react\&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge\&logo=python\&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge\&logo=typescript\&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge\&logo=leaflet\&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini_AI-8E75B2?style=for-the-badge\&logo=google\&logoColor=white)
 
 </div>
 
@@ -19,16 +19,16 @@
 
 This monorepo contains **two complementary applications** developed for the GeoRetail project at **Ecole Centrale Casablanca** (2024/2025):
 
-| Application | Description | Tech Stack |
-|-------------|-------------|------------|
-| **GeoRetail MVP** | Automated POS mapping platform with OpenStreetMap data collection, interactive visualization, and REST API | FastAPI, Leaflet.js, Chart.js |
-| **Moussadik Census** | Crowdsourced POS confirmation app with AI-powered validation using Gemini and gamification system | React 19, TypeScript, Gemini AI |
+| Application          | Description                                                                                                | Tech Stack                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| **GeoRetail MVP**    | Automated POS mapping platform with OpenStreetMap data collection, interactive visualization, and REST API | FastAPI, Leaflet.js, Chart.js   |
+| **Moussadik Census** | Crowdsourced POS confirmation app with AI-powered validation using Gemini and gamification system          | React 19, TypeScript, Gemini AI |
 
 ---
 
 ## Architecture
 
-```
+```text
 GeoRetail-Moussadik/
 |
 |-- GeoRetail_Final/          # Backend API + Web Dashboard
@@ -53,38 +53,40 @@ GeoRetail-Moussadik/
 ## GeoRetail MVP - Features
 
 ### Data Collection
-- **OpenStreetMap** automated collection via Overpass API (free)
-- **CSV/JSON import** for external datasets
-- **Manual entry** with form validation
-- Coverage: **9 regions**, **~2,976 POS** mapped
+
+* **OpenStreetMap** automated collection via Overpass API (free)
+* **CSV/JSON import** for external datasets
+* **Manual entry** with form validation
+* Coverage: **9 regions**, **~2,976 POS** mapped
 
 ### Interactive Visualization
-- **Leaflet.js** map with marker clustering
-- Advanced filters (region, type, brand, category)
-- Real-time statistics with **Chart.js**
+
+* **Leaflet.js** map with marker clustering
+* Advanced filters (region, type, brand, category)
+* Real-time statistics with **Chart.js**
 
 ### REST API (25+ Endpoints)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/pos` | List POS with filters |
-| `POST` | `/pos` | Create a POS |
-| `POST` | `/collect/osm` | Launch OSM collection |
-| `GET` | `/pos/search/nearby` | Proximity search |
-| `GET` | `/stats` | Global statistics |
-| `GET` | `/export/csv` | Export to CSV |
-| `GET` | `/export/geojson` | Export to GeoJSON |
+| Method | Endpoint             | Description           |
+| ------ | -------------------- | --------------------- |
+| `GET`  | `/pos`               | List POS with filters |
+| `POST` | `/pos`               | Create a POS          |
+| `POST` | `/collect/osm`       | Launch OSM collection |
+| `GET`  | `/pos/search/nearby` | Proximity search      |
+| `GET`  | `/stats`             | Global statistics     |
+| `GET`  | `/export/csv`        | Export to CSV         |
+| `GET`  | `/export/geojson`    | Export to GeoJSON     |
 
 ---
 
 ## Moussadik POS Census - Features
 
-- **Crowdsourced validation**: Users confirm POS existence on-site via GPS
-- **Gemini AI integration**: Intelligent POS data enrichment and validation
-- **Gamification**: Points system with rewards for active contributors
-- **Dual roles**: Consumer (confirm POS) and Owner (manage listings)
-- **Geolocation**: Real-time GPS tracking with proximity detection
-- **POS Types**: Cafes, Restaurants, Epiceries, Supermarches, Grande Surfaces
+* **Crowdsourced validation**: Users confirm POS existence on-site via GPS
+* **Gemini AI integration**: Intelligent POS data enrichment and validation
+* **Gamification**: Points system with rewards for active contributors
+* **Dual roles**: Consumer (confirm POS) and Owner (manage listings)
+* **Geolocation**: Real-time GPS tracking with proximity detection
+* **POS Types**: Cafes, Restaurants, Epiceries, Supermarches, Grande Surfaces
 
 ---
 
@@ -113,23 +115,23 @@ npm run dev
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend API** | FastAPI, Pydantic, HTTPX (async) |
-| **Frontend (Map)** | Leaflet.js, Chart.js, MarkerCluster |
-| **Frontend (Census)** | React 19, TypeScript, Vite 6 |
-| **AI** | Google Gemini AI |
-| **Data Sources** | OpenStreetMap, Overpass API, Nominatim |
-| **GIS** | GeoJSON, Leaflet, Geolocation API |
+| Layer                 | Technology                             |
+| --------------------- | -------------------------------------- |
+| **Backend API**       | FastAPI, Pydantic, HTTPX (async)       |
+| **Frontend (Map)**    | Leaflet.js, Chart.js, MarkerCluster    |
+| **Frontend (Census)** | React 19, TypeScript, Vite 6           |
+| **AI**                | Google Gemini AI                       |
+| **Data Sources**      | OpenStreetMap, Overpass API, Nominatim |
+| **GIS**               | GeoJSON, Leaflet, Geolocation API      |
 
 ---
 
 ## Authors
 
-**Meriem El Abzaze** - Engineering Student, Ecole Centrale Casablanca
+**Meriem EL ABZAZE** - Engineering Student, Ecole Centrale Casablanca / Ecole Centrale de Lyon
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/el-houssine-kamili-2565a6351/)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white)](https://github.com/elhoussine-arise)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square\&logo=linkedin\&logoColor=white)](https://www.linkedin.com/in/meriem-el-abzaze-1812a533a/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square\&logo=github\&logoColor=white)](https://github.com/Meriem91772)
 
 ---
 
