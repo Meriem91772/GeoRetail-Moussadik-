@@ -2,7 +2,6 @@
 
 ## Plateforme de Cartographie des Points de Vente au Maroc
 
-**Projet de Fin d'Études - Master DSIA**  
 **École Centrale Casablanca - 2024/2025**
 
 ---
