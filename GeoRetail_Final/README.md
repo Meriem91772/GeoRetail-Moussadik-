@@ -30,11 +30,6 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### 3. Accéder à l'interface
-
-* **Interface Web** : http://localhost:8000
-* **Documentation API** : http://localhost:8000/docs
-
 ---
 
 ## 📊 Fonctionnalités
